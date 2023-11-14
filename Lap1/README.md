@@ -1,34 +1,22 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+Предоставленный вами Dockerfile.better имеет многоэтапную сборку, которая обычно считается лучшей практикой для оптимизации образов Docker. Многоэтапные сборки помогают уменьшить размер окончательного образа за счет использования промежуточных образов для построения зависимостей и последующего копирования в итоговый образ только необходимых артефактов.
 
-## Getting Started
+Вот некоторые преимущества первого Dockerfile (многоэтапная сборка):
 
-First, run the development server:
+1. Меньший окончательный размер изображения:
+      - Окончательный образ, вероятно, будет меньше, поскольку он включает только необходимые файлы и зависимости, скопированные с промежуточных шагов. Это может привести к более быстрому и эффективному получению и развертыванию изображений.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+2. Уменьшенная поверхность атаки:
+      - Окончательный образ содержит только встроенные артефакты и зависимости времени выполнения, что сводит к минимуму поверхность атаки. Промежуточные шаги, используемые для построения зависимостей и приложения, отбрасываются, что снижает риск включения ненужных инструментов или библиотек в окончательный образ.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. Быстрая сборка:
+      - Разделив этапы сборки, вы можете воспользоваться преимуществами кэширования слоев. Если зависимости и исходный код не изменились, Docker может повторно использовать кэшированные слои с предыдущих этапов, что ускоряет процесс сборки.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+4. Четкое разделение интересов:
+      - Каждый этап Dockerfile несет определенную ответственность (например, построение зависимостей, сборка приложения, создание окончательного образа среды выполнения). Такое четкое разделение задач может сделать Dockerfile более удобным и понятным.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+С другой стороны, Dockerfile — это более простая одноэтапная сборка. Хотя это проще, в результате может получиться более крупный окончательный образ, а также включить в окончательный образ зависимости разработки, которые могут не потребоваться для производственной среды.
 
-## Learn More
+Таким образом, Dockerfile.better с многоэтапной сборкой обычно предпочтительнее для промышленного использования из-за его преимуществ с точки зрения размера образа, безопасности и эффективности сборки. Dockerfile может больше подойти для разработки или в ситуациях, когда размер образа не имеет решающего значения.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Результат выпольнил:
+![result img](/public/result_docker.png)
