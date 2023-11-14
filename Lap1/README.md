@@ -1,6 +1,6 @@
-## Лабораторная работа №1
+# Лабораторная работа №1
 
-# Плохой Dockerfile
+## Плохой Dockerfile
 
 ![docker img](./public/docker1.png)
 
@@ -16,7 +16,7 @@ RUN Yarn build: строит приложение. Предполагается,
 
 CMD ["yarn", "start"]: устанавливает команду по умолчанию, запускаемую при запуске контейнера. Это запустит приложение с помощью команды запуска пряжи. Если при запуске контейнера не указана команда, эта команда будет выполнена по умолчанию.
 
-# Хороший Dockerfile
+## Хороший Dockerfile
 
 ![docker img](./public/docker2.png)
 
@@ -25,12 +25,11 @@ CMD ["yarn", "start"]: устанавливает команду по умолч
 1. **изображение глубины:**
 
    ```Dockerfile
-   ОТ узла: 18 в зависимости от
+   FROM node:18 as deps
+   WORKDIR /app
+   COPY package.json yarn.lock ./
 
-   РАБОЧИЙ ПАРАМЕТР/приложение
-   КОПИРОВАТЬ package.json Yarn.lock ./
-
-   RUN Yarn install --frozen-lockfile
+   RUN yarn install --frozen-lockfile
    ```
 
    - Этот этап называется «депс».
@@ -41,14 +40,14 @@ CMD ["yarn", "start"]: устанавливает команду по умолч
 2. **BUILD_IMAGE:**
 
    ```Dockerfile
-   ОТ узла: 18 как BUILD_IMAGE
-
-   РАБОЧИЙ ПАРАМЕТР/приложение
-   КОПИЯ --from=deps /app/node_modules ./node_modules
-   КОПИРОВАТЬ. .
-   Сборка пряжи RUN
-   ВЫПОЛНИТЬ rm -rf node_modules
-   RUN Yarn install --production --frozen-lockfile --ignore-scripts --prefer-offline
+   FROM node:18 as BUILD_IMAGE
+   
+   WORKDIR /app
+   COPY --from=deps /app/node_modules ./node_modules
+   COPY . .
+   RUN yarn build
+   RUN rm -rf node_modules
+   RUN yarn install --production --frozen-lockfile --ignore-scripts --prefer-offline
    ```
 
    - Этот этап называется BUILD_IMAGE.
@@ -62,23 +61,22 @@ CMD ["yarn", "start"]: устанавливает команду по умолч
 3. **Окончательный результат:**
 
    ```Dockerfile
-   ОТ узла: 18
-
-   ЗАПУСК addgroup --system --gid 1001 nodejs
-   ЗАПУСК adduser --system --uid 1001 nextjs
-
-   РАБОЧИЙ ДИАПАЗОН/приложение
-
-   КОПИРОВАТЬ --from=BUILD_IMAGE --chown=nextjs:nodejs /app/package.json /app/yarn.lock ./
-   КОПИРОВАТЬ --from=BUILD_IMAGE --chown=nextjs:nodejs /app/node_modules ./node_modules
-   КОПИРОВАТЬ --from=BUILD_IMAGE --chown=nextjs:nodejs /app/public ./public
-   КОПИРОВАТЬ --from=BUILD_IMAGE --chown=nextjs:nodejs /app/.next ./.next
-
-   ПОЛЬЗОВАТЕЛЬ nextjs
-
-   ЭКСПОЗИЦИЯ 3000
-
-   CMD ["пряжа", "начало"]
+   FROM node:18 
+   RUN addgroup --system --gid 1001 nodejs
+   RUN adduser --system --uid 1001 nextjs
+   
+   WORKDIR /app
+   
+   COPY --from=BUILD_IMAGE --chown=nextjs:nodejs /app/package.json /app/yarn.lock ./
+   COPY --from=BUILD_IMAGE --chown=nextjs:nodejs /app/node_modules ./node_modules
+   COPY --from=BUILD_IMAGE --chown=nextjs:nodejs /app/public ./public
+   COPY --from=BUILD_IMAGE --chown=nextjs:nodejs /app/.next ./.next
+   
+   USER nextjs
+   
+   EXPOSE 3000
+   
+   CMD ["yarn", "start"]
    ```
 
    - Использует окончательное изображение `node:18`.
