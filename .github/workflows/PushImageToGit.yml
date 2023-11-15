@@ -2,11 +2,14 @@ name: Build and Push Docker image to Docker Hub
 
 on:
   push:
-    branches: [main]
+    branches: ["main"]
 jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "/Lap3/git_cicd"
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
@@ -20,6 +23,6 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: "./Lap3/git_cicd"
+          context: ./Lap3/git_cicd/
           push: true
           tags: tienlong1106/git_cicd:latest
