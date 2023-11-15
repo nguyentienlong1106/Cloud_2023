@@ -20,6 +20,6 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
-          context: git_cicd/
+          context: ./Lap3/git_cicd/
           push: true
           tags: tienlong1106/git_cicd:latest
