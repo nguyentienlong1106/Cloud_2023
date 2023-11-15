@@ -6,8 +6,11 @@ COPY package.json ./
 
 COPY . .
 
+RUN npm run install
 RUN npm run build
 
-COPY .next ./.next
 
 CMD ["npm", "run", "dev"]
+
+
+
