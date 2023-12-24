@@ -29,8 +29,8 @@ docker volume create to-do-db
 
 Затем запустите docker, связанный с томом, с помощью команды:
 
-docker run -v to-do-db:/db app.js
+docker run -v to-do-db:/app app.js
 
 вы можете видеть изменения данных каждый раз при запуске докера в журнале докера:
 
-![docker img](./public/2.png)
+![docker img](./public/5.png)
