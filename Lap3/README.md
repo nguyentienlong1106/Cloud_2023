@@ -1,4 +1,4 @@
-# Лабораторная работа №3
+# Лабораторная работа №3 + №3*
 ## Настройки CI/CD с помощью GitHub Actions
 Для настройки GitHub Actions необходимо создать .yml файл в директории .github/workflows/.
 
@@ -96,3 +96,70 @@ jobs:
 ![result img2](./results/add_key.png)
 ## Результат
 ![result img2](./results/result.png)
+
+----------------------------------------------------------------------------
+
+## Secure GitOps Workflows with GitHub Actions and HashiCorp Vault
+
+### First we have to download and execute run  Vault server in localhost 
+
+- We dowload Vault from offical cite Hashicorp[https://developer.hashicorp.com/vault/install?product_intent=vault], we use package ARM64 for our windown
+
+- Run it in terminal
+![result img2](./results/1.png)
+
+- Check it on localhost
+![result img2](./results/2.png)
+
+### The next we create security key 
+Sets the VAULT_ADDR environment variable to the specified address:
+```
+$env:VAULT_ADDR="http://127.0.0.1:8200"
+```
+
+We can make keys by comand:
+```
+./vault.exe kv put secret/ci DOCKERHUB_USERNAME=long DOCKERHUB_TOKEN=Long1106
+```
+
+or we can create keys in the user interface
+![result img2](./results/3.png)
+
+### Add new self-hosted runner
+
+We have to go to github -> Setting -> Action -> Runner
+![result img2](./results/4.png)
+
+
+Next is the easy task of running the command lines included in the instructions to result
+![result img2](./results/runner.png)
+
+
+### Final edit docker-compose.yml
+- change "run on: seft-hosted" is meaned runners are machines that you set up and manage yourself
+- add job
+
+      - name: import-secrets
+        uses: hashicorp/vault-action@v2
+        with:
+          url: http://127.0.0.1:8200
+          tlsSkipVerify: true
+          token: ${{ secrets.VAULT_TOKEN }}
+          secrets: |
+            secret/data//docker * | DOCKERHUB_
+
+This code
+
+name: This is the name of the step in your GitHub Actions workflow. In this case, it's named "import-secrets."
+
+uses: Specifies the action that will be used for this step. In this case, it's using the hashicorp/vault-action version 2.
+
+with: Provides input parameters for the action.
+
+url: Specifies the URL of the HashiCorp Vault instance. In this example, it's set to http://127.0.0.1:8200.
+
+tlsSkipVerify: A boolean indicating whether to skip TLS certificate verification. In this example, it's set to true, which means it will skip verification.
+
+token: Specifies the HashiCorp Vault token. The token is retrieved from GitHub Secrets using ${{ secrets.VAULT_TOKEN }}.
+
+secrets: Specifies the secrets to be imported. It looks like it's using the Vault CLI syntax. It's retrieving secrets from the path secret/data//docker* and renaming them with the prefix DOCKERHUB_. The * might be a wildcard character, and it's used to capture all secrets under the specified path.
